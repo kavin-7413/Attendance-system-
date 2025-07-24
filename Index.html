@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velmurugan Matric. Hr. Sec. School Attendance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        .school-info {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .input-section, .attendance-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Calendar Styles */
+        .calendar-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .calendar {
+            width: 400px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .calendar-header button {
+            background-color: transparent;
+            color: #333;
+            padding: 5px 10px;
+        }
+        .calendar-header h3 {
+            margin: 0;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+        .calendar-day, .calendar-weekday {
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .calendar-weekday {
+            background-color: #e9e9e9;
+            color: #555;
+        }
+        .calendar-day {
+            cursor: pointer;
+            background-color: #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        .calendar-day.sunday {
+            background-color: #ffcccc;
+            color: #cc0000;
+            cursor: not-allowed;
+        }
+        .calendar-day.today {
+            border: 2px solid #007bff;
+        }
+        .calendar-day.taken {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .calendar-day.taken:hover {
+            background-color: #c3e6cb;
+        }
+        .calendar-day:not(.sunday):not(.taken):hover {
+            background-color: #d9d9d9;
+        }
+        .calendar-day.empty {
+            background-color: transparent;
+            cursor: default;
+        }
+
+        /* Attendance Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .attendance-checkbox {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+        .percentage-cell {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Student Attendance System</h1>
+    <div class="school-info">
+        Velmurugan Matric. Hr. Sec. School, Pollachi
+    </div>
+    
+    <div class="input-section">
+        <h2>Add Student</h2>
+        <div class="form-group">
+            <label for="rollNo">Roll No:</label>
+            <input type="text" id="rollNo" placeholder="Enter Roll No" required>
+        </div>
+        <div class="form-group">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" placeholder="Enter Student Name" required>
+        </div>
+        <button onclick="addStudent()">Add Student</button>
+    </div>
+
+    <div class="attendance-section">
+        <h2>Daily Attendance</h2>
+
+        <div class="calendar-container">
+            <div class="calendar">
+                <div class="calendar-header">
+                    <button onclick="changeMonth(-1)">&#9664;</button>
+                    <h3 id="currentMonthYear"></h3>
+                    <button onclick="changeMonth(1)">&#9654;</button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <div class="calendar-weekday">Mon</div>
+                    <div class="calendar-weekday">Tue</div>
+                    <div class="calendar-weekday">Wed</div>
+                    <div class="calendar-weekday">Thu</div>
+                    <div class="calendar-weekday">Fri</div>
+                    <div class="calendar-weekday">Sat</div>
+                    <div class="calendar-weekday">Sun</div>
+                </div>
+            </div>
+        </div>
+
+        <table id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Student Name</th>
+                    </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+
+    let students = [];
+    let takenAttendanceDates = new Set();
+
+    // !! PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE !!
+    const scriptURL = 'YOUR_WEB_APP_URL_HERE';
+
+    const rollNoInput = document.getElementById('rollNo');
+    const studentNameInput = document.getElementById('studentName');
+    const attendanceTable = document.getElementById('attendanceTable');
+    const attendanceTableBody = attendanceTable.querySelector('tbody');
+    const currentMonthYearHeader = document.getElementById('currentMonthYear');
+    const calendarGrid = document.getElementById('calendarGrid');
+
+    // Helper function to format date as YYYY-MM-DD
+    function formatDate(date) {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const day = d.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Function to generate the calendar for a given month and year
+    function generateCalendar(year, month) {
+        currentMonthYearHeader.textContent = `${months[month]} ${year}`;
+        
+        // Clear previous calendar days, but keep the weekday headers
+        const dayElements = calendarGrid.querySelectorAll('.calendar-day, .empty');
+        dayElements.forEach(el => el.remove());
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        
+        const firstDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // 0=Sun, 1=Mon... so adjust for Mon-Sun week
+        
+        // Add empty days at the start of the month
+        for (let i = 0; i < firstDayOfWeek; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.classList.add('empty');
+            calendarGrid.appendChild(emptyCell);
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dateString = formatDate(date);
+            const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+            const dayCell = document.createElement('div');
+            dayCell.textContent = day;
+            dayCell.classList.add('calendar-day');
+
+            // Add classes for styling
+            if (dayOfWeek === 0) { // Sunday
+                dayCell.classList.add('sunday');
+            } else {
+                dayCell.onclick = () => addAttendanceForDate(dateString);
+            }
+
+            if (formatDate(new Date()) === dateString) {
+                dayCell.classList.add('today');
+            }
+
+            if (takenAttendanceDates.has(dateString)) {
+                dayCell.classList.add('taken');
+            }
+            
+            calendarGrid.appendChild(dayCell);
+        }
+    }
+
+    // Change month by a given amount (e.g., -1 for prev, 1 for next)
+    function changeMonth(delta) {
+        currentMonth += delta;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        } else if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        generateCalendar(currentYear, currentMonth);
+    }
+    
+    // Function to send data to the Google Sheet
+    async function sendDataToSheet(date) {
+        const payload = {
+            date: date,
+            students: students.map(s => ({
+                rollNo: s.rollNo,
+                name: s.name,
+                attendance: s.attendance[date] || 0
+            }))
+        };
+        
+        try {
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (data.result === 'success') {
+                console.log('Data saved successfully!');
+            } else {
+                console.error('Error saving data:', data.error);
+            }
+        } catch (error) {
+            console.error('Network or fetch error:', error);
+        }
+    }
+
+    // Add a new student to the system and sends data to the sheet
+    async function addStudent() {
+        const rollNo = rollNoInput.value.trim();
+        const studentName = studentNameInput.value.trim();
+
+        if (rollNo === '' || studentName === '') {
+            alert('Please enter both Roll No and Student Name.');
+            return;
+        }
+        if (students.some(student => student.rollNo === rollNo)) {
+            alert('A student with this Roll No already exists.');
+            return;
+        }
+
+        const newStudent = {
+            rollNo: rollNo,
+            name: studentName,
+            attendance: {}
+        };
+        students.push(newStudent);
+        
+        for (const date of takenAttendanceDates) {
+            await sendDataToSheet(date);
+        }
+        
+        renderTable();
+        
+        rollNoInput.value = '';
+        studentNameInput.value = '';
+    }
+
+    // Toggles a student's attendance for a specific date and saves to the sheet
+    async function toggleAttendance(rollNo, dateString) {
+        const student = students.find(s => s.rollNo === rollNo);
+        if (student) {
+            student.attendance[dateString] = student.attendance[dateString] === 0 ? 1 : 0;
+            renderTable();
+            await sendDataToSheet(dateString);
+        }
+    }
+    
+    // Adds a new attendance day from the calendar
+    async function addAttendanceForDate(dateString) {
+        if (takenAttendanceDates.has(dateString)) {
+            alert(`Attendance for ${dateString} has already been taken.`);
+            return;
+        }
+        
+        takenAttendanceDates.add(dateString);
+        
+        students.forEach(student => {
+            student.attendance[dateString] = 0;
+        });
+        
+        generateCalendar(currentYear, currentMonth);
+        renderTable();
+        await sendDataToSheet(dateString);
+    }
+    
+    // Renders the main attendance table
+    function renderTable() {
+        attendanceTableBody.innerHTML = '';
+        
+        const sortedDates = Array.from(takenAttendanceDates).sort();
+
+        const headerRow = attendanceTable.querySelector('thead tr');
+        headerRow.innerHTML = `<th>Roll No</th><th>Student Name</th>`;
+
+        sortedDates.forEach(date => {
+            const dateHeader = document.createElement('th');
+            const [year, month, day] = date.split('-');
+            dateHeader.textContent = `${day}-${month}`;
+            headerRow.appendChild(dateHeader);
+        });
+
+        const totalHeader = document.createElement('th');
+        totalHeader.textContent = `Total Attendance`;
+        headerRow.appendChild(totalHeader);
+
+        const percentageHeader = document.createElement('th');
+        percentageHeader.textContent = `Percentage`;
+        headerRow.appendChild(percentageHeader);
+
+        students.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${student.rollNo}</td><td>${student.name}</td>`;
+            
+            let totalAttendance = 0;
+            
+            sortedDates.forEach(date => {
+                const status = student.attendance[date] || 0;
+                const cell = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'attendance-checkbox';
+                checkbox.checked = status === 1;
+                checkbox.onclick = () => toggleAttendance(student.rollNo, date);
+                cell.appendChild(checkbox);
+                row.appendChild(cell);
+
+                if (status === 1) {
+                    totalAttendance++;
+                }
+            });
+            
+            const totalWorkingDays = sortedDates.length;
+            const percentage = totalWorkingDays > 0 ? ((totalAttendance / totalWorkingDays) * 100).toFixed(2) : 0;
+            
+            const totalCell = document.createElement('td');
+            totalCell.textContent = totalAttendance;
+            row.appendChild(totalCell);
+
+            const percentageCell = document.createElement('td');
+            percentageCell.className = 'percentage-cell';
+            percentageCell.textContent = `${percentage}%`;
+            row.appendChild(percentageCell);
+
+            attendanceTableBody.appendChild(row);
+        });
+    }
+
+    // Initial setup
+    generateCalendar(currentYear, currentMonth);
+</script>
+
+</body>
+</html>
